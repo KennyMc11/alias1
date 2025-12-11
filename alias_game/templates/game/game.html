@@ -1,0 +1,678 @@
+<!-- templates/game/game.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Игра Alias - Комната {{ room_id }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .room-id {
+            background: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        
+        .current-turn {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .current-turn h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .current-turn p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .score-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .score-card.current {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .team-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .target-score {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        #startExplainingBtn {
+            padding: 25px 50px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+        }
+        
+        #startExplainingBtn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(72, 187, 120, 0.4);
+        }
+        
+        #gameContent {
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .timer {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .current-word {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #333;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .word-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 20px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .guess-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .skip-btn {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+        
+        .end-turn-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 30px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .words-left {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .game-over {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+        
+        .winner {
+            font-size: 36px;
+            color: #48bb78;
+            margin: 20px 0;
+        }
+        
+        .final-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .final-score-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #e0e0e0;
+        }
+        
+        .final-score-card.winner {
+            border-color: #48bb78;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.2);
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .scores {
+                grid-template-columns: 1fr;
+            }
+            
+            .current-word {
+                font-size: 36px;
+            }
+            
+            .timer {
+                font-size: 48px;
+            }
+            
+            .word-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-info">
+            <div class="room-id">Комната: {{ room_id }}</div>
+            <div id="roundInfo">Раунд: 1</div>
+        </div>
+        
+        <div id="currentTurn" class="current-turn">
+            <!-- Здесь будет информация о текущем ходе -->
+        </div>
+        
+        <div class="scores" id="scoresContainer">
+            <!-- Счет команд будет загружен через JS -->
+        </div>
+        
+        <div class="game-area">
+            <button id="startExplainingBtn" onclick="startExplaining()">
+                🎯 Начать объяснять
+            </button>
+            
+            <div id="gameContent">
+                <div class="timer" id="timer">60</div>
+                <div class="current-word" id="currentWord"></div>
+                <div class="word-buttons">
+                    <button class="action-btn guess-btn" onclick="wordGuessed()">
+                        ✅ Отгадано
+                    </button>
+                    <button class="action-btn skip-btn" onclick="wordSkipped()">
+                        ⏭️ Пропустить
+                    </button>
+                </div>
+                <div class="words-left" id="wordsLeft">Слов осталось: 10</div>
+                <button class="action-btn end-turn-btn" onclick="endTurn()" id="endTurnBtn" style="display: none;">
+                    ⏭️ Завершить ход
+                </button>
+            </div>
+        </div>
+        
+        <div id="gameOver" class="game-over" style="display: none;">
+            <!-- Экран окончания игры -->
+        </div>
+    </div>
+    
+    <script>
+        const roomId = "{{ room_id }}";
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let currentUser = null;
+        let currentWords = [];
+        let currentWordIndex = 0;
+        let timerInterval = null;
+        let timeLeft = 60;
+        let isExplaining = false;
+        let refreshInterval = null;
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (tg.initDataUnsafe.user) {
+                currentUser = {
+                    id: tg.initDataUnsafe.user.id,
+                    first_name: tg.initDataUnsafe.user.first_name || 'Игрок'
+                };
+            }
+            
+            await loadGameState();
+            refreshInterval = setInterval(loadGameState, 2000); // Обновление каждые 2 секунды
+        });
+        
+        async function loadGameState() {
+            try {
+                const response = await fetch(`/api/room/${roomId}/state/`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert('Игра не найдена');
+                        window.location.href = '/';
+                    }
+                    return;
+                }
+                
+                const gameState = await response.json();
+                
+                if (!gameState.is_game_started) {
+                    // Если игра еще не началась, возвращаем в комнату
+                    window.location.href = `/room/${roomId}/`;
+                    return;
+                }
+                
+                updateGameUI(gameState);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки состояния игры:', error);
+            }
+        }
+        
+        function updateGameUI(gameState) {
+            // Обновляем информацию о раунде
+            document.getElementById('roundInfo').textContent = `Раунд: ${gameState.current_round}`;
+            
+            // Обновляем информацию о текущем ходе
+            const currentTurnDiv = document.getElementById('currentTurn');
+            currentTurnDiv.innerHTML = `
+                <h2>Раунд ${gameState.current_round}</h2>
+                <p>Следующая команда: <strong>${gameState.current_team_name}</strong></p>
+                <p>Объясняет: <strong>${gameState.explainer_name}</strong></p>
+            `;
+            
+            // Проверяем, является ли текущий пользователь объясняющим
+            const isCurrentExplainer = gameState.explainer_name === currentUser.first_name;
+            
+            // Показываем или скрываем кнопку начала объяснения
+            const startBtn = document.getElementById('startExplainingBtn');
+            const gameContent = document.getElementById('gameContent');
+            
+            if (isCurrentExplainer && !isExplaining) {
+                startBtn.style.display = 'block';
+                gameContent.style.display = 'none';
+            } else {
+                startBtn.style.display = 'none';
+                gameContent.style.display = 'block';
+            }
+            
+            // Обновляем счет
+            updateScores(gameState);
+            
+            // Проверяем, не закончилась ли игра
+            if (gameState.game_over) {
+                showGameOver(gameState);
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        function updateScores(gameState) {
+            const scoresContainer = document.getElementById('scoresContainer');
+            const teams = gameState.teams || [];
+            const scores = gameState.scores || {};
+            const targetScore = gameState.target_score || 50;
+            
+            scoresContainer.innerHTML = '';
+            
+            teams.forEach((teamName, index) => {
+                const score = scores[index] || 0;
+                const isCurrent = gameState.current_team_index === index;
+                
+                const scoreCard = document.createElement('div');
+                scoreCard.className = `score-card ${isCurrent ? 'current' : ''}`;
+                scoreCard.innerHTML = `
+                    <div class="team-name">${teamName}</div>
+                    <div class="score">${score}</div>
+                    <div class="target-score">/ ${targetScore}</div>
+                    ${isCurrent ? '<div style="color: #667eea; margin-top: 5px;">▼ Сейчас ходит</div>' : ''}
+                `;
+                
+                scoresContainer.appendChild(scoreCard);
+            });
+        }
+        
+        async function startExplaining() {
+            try {
+                const response = await fetch('/api/start-explaining/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ room_id: roomId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentWords = data.words || [];
+                    currentWordIndex = 0;
+                    timeLeft = data.time_limit || 60;
+                    isExplaining = true;
+                    
+                    // Показываем игровое поле
+                    document.getElementById('startExplainingBtn').style.display = 'none';
+                    document.getElementById('gameContent').style.display = 'block';
+                    
+                    // Показываем первое слово
+                    showCurrentWord();
+                    
+                    // Запускаем таймер
+                    startTimer();
+                }
+                
+            } catch (error) {
+                console.error('Ошибка начала объяснения:', error);
+            }
+        }
+        
+        function showCurrentWord() {
+            if (currentWordIndex < currentWords.length) {
+                document.getElementById('currentWord').textContent = currentWords[currentWordIndex];
+                document.getElementById('wordsLeft').textContent = 
+                    `Слов осталось: ${currentWords.length - currentWordIndex}`;
+            } else {
+                // Все слова объяснены
+                document.getElementById('currentWord').textContent = 'Все слова объяснены!';
+                document.getElementById('endTurnBtn').style.display = 'block';
+            }
+        }
+        
+        function startTimer() {
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endTurn();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = timeLeft;
+            
+            // Меняем цвет при малом времени
+            if (timeLeft <= 10) {
+                timerElement.style.color = '#e53e3e';
+                timerElement.style.animation = timeLeft <= 5 ? 'pulse 0.5s infinite' : 'none';
+            } else if (timeLeft <= 30) {
+                timerElement.style.color = '#ed8936';
+            } else {
+                timerElement.style.color = '#667eea';
+            }
+        }
+        
+        async function wordGuessed() {
+            if (!isExplaining || currentWordIndex >= currentWords.length) return;
+            
+            try {
+                const response = await fetch('/api/word-guessed/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        word_index: currentWordIndex
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Переходим к следующему слову
+                    currentWordIndex++;
+                    showCurrentWord();
+                    
+                    // Обновляем счет
+                    await loadGameState();
+                }
+                
+            } catch (error) {
+                console.error('Ошибка отметки угаданного слова:', error);
+            }
+        }
+        
+        async function wordSkipped() {
+            if (!isExplaining || currentWordIndex >= currentWords.length) return;
+            
+            try {
+                const response = await fetch('/api/word-skipped/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        word_index: currentWordIndex
+                    })
+                });
+                
+                if (response.ok) {
+                    // Переходим к следующему слову
+                    currentWordIndex++;
+                    showCurrentWord();
+                    
+                    // Обновляем счет
+                    await loadGameState();
+                }
+                
+            } catch (error) {
+                console.error('Ошибка пропуска слова:', error);
+            }
+        }
+        
+        async function endTurn() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            isExplaining = false;
+            
+            try {
+                const response = await fetch('/api/end-turn/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ room_id: roomId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.game_over) {
+                        showGameOver(data);
+                        clearInterval(refreshInterval);
+                    } else {
+                        // Сбрасываем состояние для следующего хода
+                        document.getElementById('endTurnBtn').style.display = 'none';
+                        await loadGameState();
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Ошибка завершения хода:', error);
+            }
+        }
+        
+        function showGameOver(gameState) {
+            const gameOverDiv = document.getElementById('gameOver');
+            const gameArea = document.querySelector('.game-area');
+            
+            gameArea.style.display = 'none';
+            gameOverDiv.style.display = 'block';
+            
+            const winningTeamIndex = gameState.winning_team;
+            const winningTeamName = gameState.winning_team_name;
+            const scores = gameState.scores;
+            const teams = gameState.teams || [];
+            
+            gameOverDiv.innerHTML = `
+                <h1 style="font-size: 48px; color: #667eea;">🎉 Игра окончена!</h1>
+                <div class="winner">Победила команда: ${winningTeamName}!</div>
+                
+                <div class="final-scores">
+                    ${teams.map((teamName, index) => {
+                        const score = scores[index] || 0;
+                        const isWinner = index === winningTeamIndex;
+                        
+                        return `
+                            <div class="final-score-card ${isWinner ? 'winner' : ''}">
+                                <div class="team-name">${teamName}</div>
+                                <div class="score">${score}</div>
+                                ${isWinner ? '<div style="color: #48bb78; margin-top: 10px;">🏆 ПОБЕДИТЕЛЬ</div>' : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <button class="btn" onclick="window.location.href='/'">
+                        🏠 На главную
+                    </button>
+                    <button class="btn" onclick="window.location.href='/room/${roomId}/'">
+                        🔄 Новая игра
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Добавляем анимацию пульсации для таймера
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Очистка интервалов при размонтировании
+        window.addEventListener('beforeunload', () => {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

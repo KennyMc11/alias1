@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alias - Главная</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Alias Game</h1>
+        <button class="button" onclick="createRoom()">Создать комнату</button>
+        <button class="button" onclick="joinRoom()">Войти в комнату</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        
+        function createRoom() {
+            const user = tg.initDataUnsafe.user;
+            fetch('/create-room/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    username: user.username || '',
+                    first_name: user.first_name || ''
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = `/room/${data.room_id}/`;
+            });
+        }
+        
+        function joinRoom() {
+            const roomId = prompt('Введите ID комнаты:');
+            if (roomId) {
+                const user = tg.initDataUnsafe.user;
+                fetch('/join-room/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        user_id: user.id,
+                        username: user.username || '',
+                        first_name: user.first_name || ''
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        window.location.href = `/room/${data.room_id}/`;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

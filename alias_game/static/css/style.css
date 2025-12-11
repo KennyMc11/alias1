@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: white;
+    padding: 20px;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.room-id {
+    font-size: 1.5em;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: white;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #4d96ff;
+    border-color: #4d96ff;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-success {
+    background: #51cf66;
+    border-color: #51cf66;
+}
+
+.btn-danger {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+}
+
+.btn-warning {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #333;
+}
+
+.btn-join-a {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+}
+
+.btn-join-b {
+    background: #4d96ff;
+    border-color: #4d96ff;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    color: #333;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 350px;
+    width: 90%;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1em;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.error, .success {
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+    display: none;
+}
+
+.error {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+}
+
+.success {
+    background: rgba(81, 207, 102, 0.2);
+    color: #51cf66;
+    border: 1px solid #51cf66;
+}
+
+.room-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.teams-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.team {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+}
+
+.team-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.player {
+    background: rgba(255, 255, 255, 0.15);
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.current-player {
+    border: 2px solid #ffd700;
+}
+
+.scores {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.score {
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 120px;
+}
+
+.score-a {
+    background: rgba(255, 107, 107, 0.2);
+    border: 2px solid #ff6b6b;
+}
+
+.score-b {
+    background: rgba(77, 150, 255, 0.2);
+    border: 2px solid #4d96ff;
+}
+
+.score-value {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.timer {
+    font-size: 4em;
+    text-align: center;
+    margin: 20px 0;
+    font-family: monospace;
+}
+
+.word-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px 20px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.word {
+    font-size: 2.5em;
+    font-weight: bold;
+    min-height: 1.2em;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #4d96ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.winner {
+    background: rgba(255, 215, 0, 0.2);
+    border: 2px solid #ffd700;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    margin: 30px 0;
+    display: none;
+}
+
+.waiting {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.7);
+}
