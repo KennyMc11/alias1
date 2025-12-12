@@ -1,20 +1,25 @@
 # game/urls.py
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('create-room/', views.create_room, name='create_room'),
-    path('join-room/', views.join_room, name='join_room'),
-    path('update-room-settings/', views.update_room_settings, name='update_room_settings'),
-    path('join-team/', views.join_team, name='join_team'),
-    path('update-team-name/', views.update_team_name, name='update_team_name'),
-    path('start-game/', views.start_game, name='start_game'),
-    path('room/<str:room_id>/', views.room_page, name='room_page'),
-    path('game/<str:room_id>/', views.game_page, name='game_page'),
-    path('api/room/<str:room_id>/state/', views.get_room_state, name='get_room_state'),
-    path('api/start-explaining/', views.start_explaining, name='start_explaining'),
-    path('api/word-guessed/', views.word_guessed, name='word_guessed'),
-    path('api/word-skipped/', views.word_skipped, name='word_skipped'),
-    path('api/end-turn/', views.end_turn, name='end_turn'),
+    path('create/', views.create_room, name='create_room'),
+    path('create/post/', views.create_room_post, name='create_room_post'),
+    path('join/', views.join_room, name='join_room'),
+    path('join/post/', views.join_room_post, name='join_room_post'),
+    path('set_identity/', views.set_web_identity, name='set_web_identity'),
+    path('room/<uuid:room_id>/', views.room_detail, name='room_detail'),
+    
+    # AJAX API для игры
+    path('room/<uuid:room_id>/state/', views.get_game_state, name='get_game_state'),
+    path('room/<uuid:room_id>/update_team_name/', views.update_team_name, name='update_team_name'),
+    path('room/<uuid:room_id>/select_team/', views.select_team, name='select_team'),
+    path('room/<uuid:room_id>/start_game/', views.start_game, name='start_game'),
+    path('room/<uuid:room_id>/start_round/', views.start_round, name='start_round'),
+    path('room/<uuid:room_id>/guessed/', views.handle_word_action, {'action': 'guessed'}, name='guess_word'),
+    path('room/<uuid:room_id>/skip/', views.handle_word_action, {'action': 'skip'}, name='skip_word'),
+    path('room/<uuid:room_id>/end_round_timer/', views.end_round_timer, name='end_round_timer'),
+    path('room/<uuid:room_id>/reset_game/', views.reset_game, name='reset_game'),
 ]

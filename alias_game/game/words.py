@@ -1,38 +1,22 @@
 # game/words.py
 
-EASY_WORDS = [
-    'кот', 'дом', 'солнце', 'вода', 'книга', 'рука', 'ночь', 'день', 'окно', 'стул',
-    'стол', 'хлеб', 'молоко', 'кофе', 'чай', 'школа', 'учитель', 'ученик', 'машина',
-    'дорога', 'город', 'село', 'лес', 'река', 'гора', 'птица', 'рыба', 'собака', 'цветок',
-    'дерево', 'фрукт', 'овощ', 'зима', 'лето', 'весна', 'осень', 'погода', 'дождь', 'снег',
-    'ветер', 'огонь', 'земля', 'воздух', 'море', 'остров', 'пляж', 'песок', 'камень', 'звезда'
-]
-
-MEDIUM_WORDS = [
-    'компьютер', 'программа', 'интернет', 'телефон', 'телевизор', 'холодильник',
-    'микроволновка', 'электричество', 'батарейка', 'аккумулятор', 'университет',
-    'библиотека', 'лаборатория', 'эксперимент', 'исследование', 'путешествие',
-    'приключение', 'экскурсия', 'памятник', 'музей', 'театр', 'кинотеатр',
-    'ресторан', 'кафе', 'больница', 'поликлиника', 'аптека', 'супермаркет',
-    'универмаг', 'стадион', 'спортзал', 'бассейн', 'тренажер', 'чемпионат',
-    'олимпиада', 'медаль', 'кубок', 'победа', 'поражение', 'ничья', 'соревнование'
-]
-
-HARD_WORDS = [
-    'электрификация', 'индустриализация', 'глобализация', 'урбанизация',
-    'модернизация', 'оптимизация', 'стандартизация', 'сертификация',
-    'квалификация', 'специализация', 'университетский', 'интеллектуальный',
-    'профессиональный', 'инновационный', 'технологический', 'экологический',
-    'психологический', 'философский', 'математический', 'физический',
-    'химический', 'биологический', 'астрономический', 'географический',
-    'исторический', 'политический', 'экономический', 'социологический',
-    'культурологический', 'археологический', 'палеонтологический'
-]
-
-def get_words_by_difficulty(difficulty):
-    if difficulty == 'easy':
-        return EASY_WORDS
-    elif difficulty == 'hard':
-        return HARD_WORDS
-    else:
-        return MEDIUM_WORDS
+WORDS = {
+    'easy': [
+        'apple', 'house', 'cat', 'sun', 'tree', 'book', 'car', 'ball', 'cup', 'shoe',
+        'dog', 'milk', 'bed', 'chair', 'moon', 'star', 'door', 'fish', 'hand', 'nose',
+        'ear', 'mouth', 'eye', 'leg', 'arm', 'foot', 'water', 'fire', 'sky', 'grass',
+        'hat', 'coat', 'sock', 'glove', 'key', 'clock', 'table', 'lamp', 'phone', 'bag'
+    ],
+    'medium': [
+        'computer', 'elephant', 'bicycle', 'guitar', 'flower', 'mountain', 'rainbow', 'umbrella', 'sandwich', 'window',
+        'glasses', 'pencil', 'camera', 'keyboard', 'telephone', 'sweater', 'diamond', 'octopus', 'pyramid', 'rocket',
+        'island', 'desert', 'forest', 'ocean', 'river', 'bridge', 'castle', 'robot', 'dragon', 'unicorn',
+        'butterfly', 'spider', 'penguin', 'giraffe', 'zebra', 'dolphin', 'whale', 'parrot', 'ostrich', 'kangaroo'
+    ],
+    'hard': [
+        'ephemeral', 'ubiquitous', 'serendipity', 'cacophony', 'eloquence', 'paradox', 'melancholy', 'quixotic', 'luminous', 'nebulous',
+        'plethora', 'benevolent', 'malevolent', 'chrysanthemum', 'onomatopoeia', 'photosynthesis', 'metamorphosis', 'extravaganza', 'philanthropy', 'chameleon',
+        'labyrinth', 'renaissance', 'silhouette', 'constellation', 'magnanimous', 'egregious', 'idiosyncrasy', 'juxtaposition', 'sophisticated', 'vicarious',
+        'xenophobia', 'zeitgeist', 'esoteric', 'capricious', 'facetious', 'gregarious', 'harbinger', 'impeccable', 'jovial', 'kudos'
+    ]
+}

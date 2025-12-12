@@ -357,7 +357,7 @@
         
         async function loadGameState() {
             try {
-                const response = await fetch(`/api/room/${roomId}/state/`);
+                const response = await fetch(`/api/room/${roomId}/state/`, { credentials: 'same-origin' });
                 if (!response.ok) {
                     if (response.status === 404) {
                         alert('Игра не найдена');
@@ -447,8 +447,10 @@
             try {
                 const response = await fetch('/api/start-explaining/', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || ''
                     },
                     body: JSON.stringify({ room_id: roomId })
                 });
@@ -523,8 +525,10 @@
             try {
                 const response = await fetch('/api/word-guessed/', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || ''
                     },
                     body: JSON.stringify({
                         room_id: roomId,
@@ -554,8 +558,10 @@
             try {
                 const response = await fetch('/api/word-skipped/', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || ''
                     },
                     body: JSON.stringify({
                         room_id: roomId,
@@ -587,8 +593,10 @@
             try {
                 const response = await fetch('/api/end-turn/', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || ''
                     },
                     body: JSON.stringify({ room_id: roomId })
                 });

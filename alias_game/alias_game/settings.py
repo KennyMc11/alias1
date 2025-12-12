@@ -22,6 +22,15 @@ else:
     csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins.split(',') if origin.strip()]
 
+# Для разработки добавляем локальные origin-ы в CSRF_TRUSTED_ORIGINS чтобы избежать ошибок в dev
+if DEBUG:
+    dev_origins = [
+        'http://localhost:8000', 'https://localhost:8000',
+        'http://127.0.0.1:8000', 'https://127.0.0.1:8000'
+    ]
+    # Объединяем уникальными элементами
+    CSRF_TRUSTED_ORIGINS = list(dict.fromkeys((CSRF_TRUSTED_ORIGINS or []) + dev_origins))
+
 # Приложения
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -127,3 +136,5 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', default='')
 
 # WhiteNoise
 WHITENOISE_MAX_AGE = 31536000
+
+ROUND_DURATION_SECONDS = 60 # 60 секунд на раунд

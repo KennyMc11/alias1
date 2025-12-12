@@ -1,48 +1,146 @@
 <!-- templates/game/create_room.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Создать комнату - Alias</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать комнату Alias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: sans-serif;
+            background-color: #f0f2f5;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
         }
-        
+
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 20px;
             text-align: center;
         }
-        
-        .loading {
-            font-size: 24px;
-            color: #667eea;
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            border-color: #1a73e8;
+        }
+
+        .alert {
+            margin-top: 15px;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="loading">Создание комнаты...</div>
+        <h1>Создать комнату</h1>
+        {% if not telegram_user_info.id %}
+        <div class="alert alert-warning">
+            Мы не получили данные Telegram. Введите имя игрока, чтобы продолжить.
+        </div>
+        <form method="post" action="{% url 'set_web_identity' %}" class="mb-3" id="webIdentityForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'create_room' %}">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="web_username" placeholder="Ваше имя" required minlength="2" maxlength="50">
+                <button class="btn btn-primary" type="submit">Установить имя</button>
+            </div>
+        </form>
+        {% endif %}
+        <form id="createRoomForm">
+            {% csrf_token %}
+            <input type="hidden" name="tg_user_id" value="{{ telegram_user_info.id }}">
+            <input type="hidden" name="tg_username" value="{{ telegram_user_info.username }}">
+
+            <div class="mb-3">
+                <label for="num_teams" class="form-label">Количество команд:</label>
+                <select class="form-select" id="num_teams" name="num_teams" required>
+                    <option value="2">2 команды</option>
+                    <option value="3">3 команды</option>
+                    <option value="4">4 команды</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="difficulty" class="form-label">Сложность слов:</label>
+                <select class="form-select" id="difficulty" name="difficulty" required>
+                    <option value="easy">Легкий</option>
+                    <option value="medium" selected>Средний</option>
+                    <option value="hard">Сложный</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="winning_score" class="form-label">Очки для победы:</label>
+                <input type="number" class="form-control" id="winning_score" name="winning_score" value="50" min="10"
+                    required>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="penalty_for_skip" name="penalty_for_skip" checked>
+                <label class="form-check-label" for="penalty_for_skip">
+                    Штраф за пропуск (-1 балл)
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Создать комнату</button>
+            <div id="alertPlaceholder" class="alert d-none mt-3" role="alert"></div>
+        </form>
     </div>
-    
+
     <script>
-        // Эта страница просто перенаправляет на главную
-        // Вся логика создания комнаты в index.html
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 1000);
+        document.getElementById('createRoomForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+            fetch("{% url 'create_room_post' %}", {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text || response.statusText); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = `/room/${data.room_id}/?tg_user_id=${formData.get('tg_user_id')}&tg_username=${formData.get('tg_username')}`;
+                    } else {
+                        alertPlaceholder.classList.remove('d-none', 'alert-success');
+                        alertPlaceholder.classList.add('alert-danger');
+                        alertPlaceholder.textContent = data.message || 'Произошла ошибка при создании комнаты.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alertPlaceholder.classList.remove('d-none', 'alert-success');
+                    alertPlaceholder.classList.add('alert-danger');
+                    alertPlaceholder.textContent = (error && error.message) ? error.message : 'Ошибка сети или сервера. Попробуйте еще раз.';
+                });
+        });
     </script>
 </body>
+
 </html>
