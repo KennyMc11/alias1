@@ -1,0 +1,31 @@
+<!-- templates/game/room_not_found.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Комната не найдена — Alias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; color: #333; }
+        .page { max-width: 720px; margin: 60px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+        h1 { color: #1a73e8; }
+        .muted { color: #666; }
+    </style>
+</head>
+<body>
+    <div class="page text-center">
+        <h1>Комната не найдена</h1>
+        <p class="muted">Запрошенная комната <strong>{{ room_id }}</strong> не найдена или была удалена.</p>
+
+        <div class="mt-4">
+            <a href="{% url 'index' %}" class="btn btn-primary">Вернуться на главную</a>
+            <a href="{% url 'join_room' %}" class="btn btn-outline-primary ms-2">Войти в другую комнату</a>
+            <a href="{% url 'create_room' %}" class="btn btn-outline-secondary ms-2">Создать новую комнату</a>
+        </div>
+
+        <hr class="my-4">
+        <p class="muted small">Поддерживаются 6-значные числовые ID комнат (например: 123456). Проверьте код и попробуйте снова или воспользуйтесь страницей входа.</p>
+    </div>
+</body>
+</html>

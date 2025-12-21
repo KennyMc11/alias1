@@ -3,6 +3,7 @@ import environ
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+import whitenoise
 
 load_dotenv()
 
@@ -138,3 +139,39 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', default='')
 WHITENOISE_MAX_AGE = 31536000
 
 ROUND_DURATION_SECONDS = 60 # 60 секунд на раунд
+
+# settings.py - добавьте в конец
+
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': 'logs/alias_game.log',
+                'maxBytes': 1024 * 1024 * 5,  # 5 MB
+                'backupCount': 5,
+                'formatter': 'detailed',
+            },
+        },
+        'formatters': {
+            'detailed': {
+                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            },
+        },
+        'loggers': {
+            'game': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO' if DEBUG else 'WARNING',
+                'propagate': True,
+            },
+            'django.db.backends': {
+                'level': 'ERROR' if DEBUG else 'WARNING',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+        },
+    }
